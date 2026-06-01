@@ -1,0 +1,75 @@
+import { createRoot } from "react-dom/client";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+
+import "./index.css";
+import Protected from "./components/Protected.jsx";
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import CreateTournament from "./pages/CreateTournament.jsx";
+import TournamentDetails from "./pages/TournamentDetails.jsx";
+import MatchAdmin from "./pages/MatchAdmin.jsx";
+import LiveMatch from "./pages/LiveMatch.jsx";
+
+const queryClient = new QueryClient();
+
+
+
+createRoot(document.getElementById("root")).render(
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/"
+          element={
+            <Protected>
+              <Dashboard />
+            </Protected>
+          }
+        />
+
+        <Route
+          path="/create"
+          element={
+            <Protected>
+              <CreateTournament />
+            </Protected>
+          }
+        />
+
+        <Route
+          path="/tournaments/:id"
+          element={
+            <Protected>
+              <TournamentDetails />
+            </Protected>
+          }
+        />
+
+        <Route
+          path="/matches/:id/admin"
+          element={
+            <Protected>
+              <MatchAdmin />
+            </Protected>
+          }
+        />
+
+        <Route
+          path="/matches/:id/live"
+          element={<LiveMatch />}
+        />
+      </Routes>
+    </BrowserRouter>
+  </QueryClientProvider>
+);
