@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import authRoutes from './routes/authRoutes.js';
+import tournamentRoutes from './routes/tournamentRoutes.js';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.get('/', (_req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/tournaments', tournamentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
