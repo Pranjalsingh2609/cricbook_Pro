@@ -15,7 +15,7 @@ import "./index.css";
 import Protected from "./components/Protected.jsx";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import CreateTournament from "./pages/CreateTournament.jsx";
+import CreateTournament from "./pages/createTournament.jsx";
 import TournamentDetails from "./pages/TournamentDetails.jsx";
 import MatchAdmin from "./pages/MatchAdmin.jsx";
 import LiveMatch from "./pages/LiveMatch.jsx";
