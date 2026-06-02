@@ -3,7 +3,7 @@ import axios from 'axios';
 export const api = axios.create({
   baseURL:
     import.meta.env.VITE_API_URL ||
-    'https://cricbookpro-o63a7utq.b4a.run/api',
+    'https://cricbookpro-qikl595b.b4a.run/api',
 });
 
 api.interceptors.request.use(config => {
