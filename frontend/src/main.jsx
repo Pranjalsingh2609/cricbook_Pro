@@ -3,6 +3,7 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
 
 import {
@@ -20,8 +21,6 @@ import MatchAdmin from "./pages/MatchAdmin.jsx";
 import LiveMatch from "./pages/LiveMatch.jsx";
 
 const queryClient = new QueryClient();
-
-
 
 createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
@@ -65,10 +64,9 @@ createRoot(document.getElementById("root")).render(
           }
         />
 
-        <Route
-          path="/matches/:id/live"
-          element={<LiveMatch />}
-        />
+        <Route path="/matches/:id/live" element={<LiveMatch />} />
+
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>
