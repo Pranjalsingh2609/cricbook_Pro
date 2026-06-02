@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { addBall, getMatch, scoreSummary, startMatch, undoBall } from '../controllers/matchController.js';
-import { auth } from '../middleware/auth.js';
+import { auth } from '../middlewares/auth.js';
 
 const router = Router();
 router.get('/:id', getMatch);

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createTournament, generateFixtures, getTournament, listTournaments } from '../controllers/tournamentController.js';
-import { auth } from '../middleware/auth.js';
+import { auth } from '../middlewares/auth.js';
 
 const router = Router();
 router.use(auth);
