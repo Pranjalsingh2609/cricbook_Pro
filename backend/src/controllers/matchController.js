@@ -24,27 +24,154 @@ export async function startMatch(req, res) {
 
 export async function addBall(req, res) {
   const { matchId } = req.params;
-  const { inningsNo = 1, runsBat = 0, extraRuns = 0, extraType = null, isWicket = false, wicketType = null, note = '' } = req.body;
-  const inningsResult = await query('SELECT * FROM innings WHERE match_id=$1 AND innings_no=$2', [matchId, inningsNo]);
-  const innings = inningsResult.rows[0];
-  if (!innings) return res.status(404).json({ message: 'Innings not started' });
 
-  const legal = isLegalBall(extraType);
-  const nextBallNo = innings.valid_balls + (legal ? 1 : 0);
-  const ball = await query(
-    'INSERT INTO balls(innings_id,ball_no,runs_bat,extra_runs,extra_type,is_wicket,wicket_type,is_legal,note) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',
-    [innings.id, nextBallNo, runsBat, extraRuns, extraType, isWicket, wicketType, legal, note]
+  const {
+    inningsNo = 1,
+    runsBat = 0,
+    extraRuns = 0,
+    extraType = null,
+    isWicket = false,
+    wicketType = null,
+    note = '',
+  } = req.body;
+
+  const inningsResult = await query(
+    'SELECT * FROM innings WHERE match_id=$1 AND innings_no=$2',
+    [matchId, inningsNo]
   );
 
-  const runs = innings.runs + Number(runsBat) + Number(extraRuns);
-  const wickets = innings.wickets + (isWicket ? 1 : 0);
-  const validBalls = innings.valid_balls + (legal ? 1 : 0);
-  const extras = innings.extras + Number(extraRuns);
+  const innings = inningsResult.rows[0];
 
-  const updated = await query('UPDATE innings SET runs=$1,wickets=$2,valid_balls=$3,extras=$4 WHERE id=$5 RETURNING *', [runs, wickets, validBalls, extras, innings.id]);
+  if (!innings) {
+    return res.status(404).json({ message: 'Innings not started' });
+  }
 
-  req.io?.to(matchId).emit('score_updated', { innings: updated.rows[0], ball: ball.rows[0] });
-  res.status(201).json({ innings: updated.rows[0], ball: ball.rows[0] });
+  const legal = isLegalBall(extraType);
+
+  const nextBallNo =
+    innings.valid_balls + (legal ? 1 : 0);
+
+  const ball = await query(
+    `INSERT INTO balls
+    (innings_id, ball_no, runs_bat, extra_runs, extra_type,
+     is_wicket, wicket_type, is_legal, note)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+     RETURNING *`,
+    [
+      innings.id,
+      nextBallNo,
+      runsBat,
+      extraRuns,
+      extraType,
+      isWicket,
+      wicketType,
+      legal,
+      note,
+    ]
+  );
+
+  const runs =
+    Number(innings.runs) +
+    Number(runsBat) +
+    Number(extraRuns);
+
+  const wickets =
+    Number(innings.wickets) +
+    (isWicket ? 1 : 0);
+
+  const validBalls =
+    Number(innings.valid_balls) +
+    (legal ? 1 : 0);
+
+  const extras =
+    Number(innings.extras) +
+    Number(extraRuns);
+
+  const updated = await query(
+    `UPDATE innings
+     SET runs=$1,
+         wickets=$2,
+         valid_balls=$3,
+         extras=$4
+     WHERE id=$5
+     RETURNING *`,
+    [
+      runs,
+      wickets,
+      validBalls,
+      extras,
+      innings.id,
+    ]
+  );
+
+  // Get match + overs limit
+  const matchResult = await query(
+    `SELECT m.*, t.overs
+     FROM matches m
+     JOIN tournaments t
+       ON t.id = m.tournament_id
+     WHERE m.id = $1`,
+    [matchId]
+  );
+
+  const match = matchResult.rows[0];
+  const ballsLimit = Number(match.overs) * 6;
+
+  // Auto change innings when overs complete
+  if (validBalls >= ballsLimit) {
+
+    // First innings finished
+    if (Number(inningsNo) === 1) {
+
+      const secondInnings = await query(
+        'SELECT * FROM innings WHERE match_id=$1 AND innings_no=2',
+        [matchId]
+      );
+
+      if (!secondInnings.rows.length) {
+        await query(
+          `INSERT INTO innings
+          (match_id, batting_team_id, bowling_team_id, innings_no)
+          VALUES ($1,$2,$3,2)`,
+          [
+            matchId,
+            innings.bowling_team_id,
+            innings.batting_team_id,
+          ]
+        );
+      }
+
+      req.io?.to(matchId).emit(
+        'innings_changed',
+        { inningsNo: 2 }
+      );
+
+    } else {
+
+      // Second innings finished
+      await query(
+        `UPDATE matches
+         SET status='completed'
+         WHERE id=$1`,
+        [matchId]
+      );
+
+      req.io?.to(matchId).emit(
+        'match_completed',
+        { matchId }
+      );
+    }
+  }
+
+  req.io?.to(matchId).emit('score_updated', {
+    innings: updated.rows[0],
+    ball: ball.rows[0],
+  });
+
+  return res.status(201).json({
+    innings: updated.rows[0],
+    ball: ball.rows[0],
+  });
 }
 
 export async function undoBall(req, res) {
