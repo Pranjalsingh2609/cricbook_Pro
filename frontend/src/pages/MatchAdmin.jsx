@@ -24,15 +24,23 @@ export default function MatchAdmin() {
     enabled: !!id,
   });
 
+
+
   async function start(teamId) {
     await api.post(`/matches/${id}/start`, {
       tossWinnerId: teamId,
       battingFirstTeamId: teamId,
     });
+
     refetch();
   }
 
-  async function ball(runsBat, extraRuns = 0, extraType = null, isWicket = false) {
+  async function ball(
+    runsBat,
+    extraRuns = 0,
+    extraType = null,
+    isWicket = false
+  ) {
     await api.post(`/matches/${id}/ball`, {
       inningsNo: Number(inningsNo),
       runsBat,
@@ -40,6 +48,7 @@ export default function MatchAdmin() {
       extraType,
       isWicket,
     });
+
     refetch();
   }
 
@@ -47,27 +56,40 @@ export default function MatchAdmin() {
     await api.post(`/matches/${id}/undo`, {
       inningsNo: Number(inningsNo),
     });
+
     refetch();
   }
 
-  if (isLoading || !data) return <p className="p-6">Loading...</p>;
+  if (isLoading || !data) {
+    return <p className="p-6">Loading...</p>;
+  }
 
   const { matchData, summary } = data;
 
   const current = summary?.innings?.find(
-    (i) => i.innings_no === Number(inningsNo)
+    (i) => Number(i.innings_no) === Number(inningsNo)
   );
+
+  const secondInningsExists =
+    summary?.innings?.some(
+      (i) => Number(i.innings_no) === 2
+    ) || false;
 
   return (
     <>
       <Navbar />
 
       <main className="p-4 sm:p-6 max-w-5xl mx-auto space-y-5">
+
         <div className="card">
           <h1 className="text-2xl sm:text-3xl font-bold">
-            {matchData.match.team_a_name} vs {matchData.match.team_b_name}
+            {matchData.match.team_a_name} vs{" "}
+            {matchData.match.team_b_name}
           </h1>
-          <p className="text-slate-400">Status: {matchData.match.status}</p>
+
+          <p className="text-slate-400">
+            Status: {matchData.match.status}
+          </p>
         </div>
 
         {matchData.match.status === "scheduled" && (
@@ -77,11 +99,21 @@ export default function MatchAdmin() {
             </h2>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <button className="btn" onClick={() => start(matchData.match.team_a_id)}>
+              <button
+                className="btn"
+                onClick={() =>
+                  start(matchData.match.team_a_id)
+                }
+              >
                 {matchData.match.team_a_name}
               </button>
 
-              <button className="btn" onClick={() => start(matchData.match.team_b_id)}>
+              <button
+                className="btn"
+                onClick={() =>
+                  start(matchData.match.team_b_id)
+                }
+              >
                 {matchData.match.team_b_name}
               </button>
             </div>
@@ -97,47 +129,76 @@ export default function MatchAdmin() {
           </h2>
 
           <p className="text-slate-400">
-            Run Rate: {current?.runRate || "0.00"}{" "}
-            {current?.requiredRate && `• Required: ${current.requiredRate}`}
+            Run Rate: {current?.runRate || "0.00"}
+
+            {current?.requiredRate &&
+              ` • Required: ${current.requiredRate}`}
           </p>
         </div>
 
         <div className="card space-y-4">
+
           <select
             className="input max-w-xs"
             value={inningsNo}
-            onChange={(e) => setInningsNo(Number(e.target.value))}
+            onChange={(e) =>
+              setInningsNo(Number(e.target.value))
+            }
           >
             <option value={1}>1st Innings</option>
-            <option value={2}>2nd Innings</option>
+
+            {secondInningsExists && (
+              <option value={2}>2nd Innings</option>
+            )}
           </select>
 
           <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
             {[0, 1, 2, 3, 4, 6].map((r) => (
-              <button key={r} className="btn" onClick={() => ball(r)}>
+              <button
+                key={r}
+                className="btn"
+                onClick={() => ball(r)}
+              >
                 {r}
               </button>
             ))}
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <button className="btn" onClick={() => ball(0, 1, "wide")}>
+
+            <button
+              className="btn"
+              onClick={() => ball(0, 1, "wide")}
+            >
               Wide +1
             </button>
 
-            <button className="btn" onClick={() => ball(0, 1, "no_ball")}>
+            <button
+              className="btn"
+              onClick={() => ball(0, 1, "no_ball")}
+            >
               No Ball +1
             </button>
 
-            <button className="btn" onClick={() => ball(0, 0, null, true)}>
+            <button
+              className="btn"
+              onClick={() =>
+                ball(0, 0, null, true)
+              }
+            >
               Wicket
             </button>
 
-            <button className="rounded-lg bg-red-500 px-4 py-2 font-bold" onClick={undo}>
+            <button
+              className="rounded-lg bg-red-500 px-4 py-2 font-bold"
+              onClick={undo}
+            >
               Undo
             </button>
+
           </div>
         </div>
+
       </main>
     </>
   );
