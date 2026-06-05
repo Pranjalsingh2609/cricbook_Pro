@@ -34,7 +34,7 @@ export default function Login() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-6 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 relative overflow-hidden">
+   <main className="min-h-screen flex items-center justify-center px-4 py-6 bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950 relative overflow-hidden">
 
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-64 h-64 sm:w-96 sm:h-96 bg-emerald-500/20 blur-[100px] sm:blur-[140px] rounded-full" />
