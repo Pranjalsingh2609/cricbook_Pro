@@ -3,8 +3,18 @@ import { isLegalBall, oversText, runRate, requiredRate } from '../utils/score.js
 
 export async function getMatch(req, res) {
   const { id } = req.params;
-  const match = await query(`SELECT m.*, ta.name AS team_a_name, tb.name AS team_b_name
-    FROM matches m JOIN teams ta ON ta.id=m.team_a_id JOIN teams tb ON tb.id=m.team_b_id WHERE m.id=$1`, [id]);
+const match = await query(`
+SELECT
+  m.*,
+  ta.name AS team_a_name,
+  tb.name AS team_b_name,
+  wt.name AS winner_team_name
+FROM matches m
+JOIN teams ta ON ta.id = m.team_a_id
+JOIN teams tb ON tb.id = m.team_b_id
+LEFT JOIN teams wt ON wt.id = m.winner_team_id
+WHERE m.id = $1
+`, [id]);
   if (!match.rows[0]) return res.status(404).json({ message: 'Match not found' });
   const innings = await query('SELECT * FROM innings WHERE match_id=$1 ORDER BY innings_no', [id]);
   res.json({ match: match.rows[0], innings: innings.rows });
