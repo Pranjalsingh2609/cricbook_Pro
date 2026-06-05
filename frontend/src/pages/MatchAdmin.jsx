@@ -24,8 +24,6 @@ export default function MatchAdmin() {
     enabled: !!id,
   });
 
-
-
   async function start(teamId) {
     await api.post(`/matches/${id}/start`, {
       tossWinnerId: teamId,
@@ -39,7 +37,7 @@ export default function MatchAdmin() {
     runsBat,
     extraRuns = 0,
     extraType = null,
-    isWicket = false
+    isWicket = false,
   ) {
     await api.post(`/matches/${id}/ball`, {
       inningsNo: Number(inningsNo),
@@ -67,29 +65,29 @@ export default function MatchAdmin() {
   const { matchData, summary } = data;
 
   const current = summary?.innings?.find(
-    (i) => Number(i.innings_no) === Number(inningsNo)
+    (i) => Number(i.innings_no) === Number(inningsNo),
   );
 
   const secondInningsExists =
-    summary?.innings?.some(
-      (i) => Number(i.innings_no) === 2
-    ) || false;
+    summary?.innings?.some((i) => Number(i.innings_no) === 2) || false;
 
   return (
     <>
       <Navbar />
 
       <main className="p-4 sm:p-6 max-w-5xl mx-auto space-y-5">
-
         <div className="card">
           <h1 className="text-2xl sm:text-3xl font-bold">
-            {matchData.match.team_a_name} vs{" "}
-            {matchData.match.team_b_name}
+            {matchData.match.team_a_name} vs {matchData.match.team_b_name}
           </h1>
 
-          <p className="text-slate-400">
-            Status: {matchData.match.status}
-          </p>
+          <p className="text-slate-400">Status: {matchData.match.status}</p>
+
+          {matchData.match.status === "completed" && (
+            <div className="mt-4 rounded-xl bg-green-600 p-4 text-white text-xl font-bold">
+              🏆 Winner: {matchData.match.winner_team_name}
+            </div>
+          )}
         </div>
 
         {matchData.match.status === "scheduled" && (
@@ -101,18 +99,14 @@ export default function MatchAdmin() {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 className="btn"
-                onClick={() =>
-                  start(matchData.match.team_a_id)
-                }
+                onClick={() => start(matchData.match.team_a_id)}
               >
                 {matchData.match.team_a_name}
               </button>
 
               <button
                 className="btn"
-                onClick={() =>
-                  start(matchData.match.team_b_id)
-                }
+                onClick={() => start(matchData.match.team_b_id)}
               >
                 {matchData.match.team_b_name}
               </button>
@@ -130,62 +124,39 @@ export default function MatchAdmin() {
 
           <p className="text-slate-400">
             Run Rate: {current?.runRate || "0.00"}
-
-            {current?.requiredRate &&
-              ` • Required: ${current.requiredRate}`}
+            {current?.requiredRate && ` • Required: ${current.requiredRate}`}
           </p>
         </div>
 
         <div className="card space-y-4">
-
           <select
             className="input max-w-xs"
             value={inningsNo}
-            onChange={(e) =>
-              setInningsNo(Number(e.target.value))
-            }
+            onChange={(e) => setInningsNo(Number(e.target.value))}
           >
             <option value={1}>1st Innings</option>
 
-            {secondInningsExists && (
-              <option value={2}>2nd Innings</option>
-            )}
+            {secondInningsExists && <option value={2}>2nd Innings</option>}
           </select>
 
           <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
             {[0, 1, 2, 3, 4, 6].map((r) => (
-              <button
-                key={r}
-                className="btn"
-                onClick={() => ball(r)}
-              >
+              <button key={r} className="btn" onClick={() => ball(r)}>
                 {r}
               </button>
             ))}
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-
-            <button
-              className="btn"
-              onClick={() => ball(0, 1, "wide")}
-            >
+            <button className="btn" onClick={() => ball(0, 1, "wide")}>
               Wide +1
             </button>
 
-            <button
-              className="btn"
-              onClick={() => ball(0, 1, "no_ball")}
-            >
+            <button className="btn" onClick={() => ball(0, 1, "no_ball")}>
               No Ball +1
             </button>
 
-            <button
-              className="btn"
-              onClick={() =>
-                ball(0, 0, null, true)
-              }
-            >
+            <button className="btn" onClick={() => ball(0, 0, null, true)}>
               Wicket
             </button>
 
@@ -195,10 +166,8 @@ export default function MatchAdmin() {
             >
               Undo
             </button>
-
           </div>
         </div>
-
       </main>
     </>
   );
