@@ -135,68 +135,121 @@ export default function TournamentDetails() {
             </div>
           </section>
 
-          
-          {/* Fixtures Banner */}
-          <div className="overflow-hidden rounded-3xl border border-slate-800 shadow-2xl">
+          {/* Fixtures Hero */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-800 shadow-2xl h-64 sm:h-80 lg:h-96">
             <img
               src="https://www.sakshi.com/gallery_images/2023/11/18/Captains%20Rohit%20Sharma%20and%20Pat%20Cummins%20with%20the%20trophy%20ahead%20of%202023%20World%20Cup%20final%20Photos_8.jpg"
               alt="Tournament Fixtures"
-              className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-linear-to-r from-[#071028]/95 via-[#071028]/75 to-[#071028]/20" />
+
+            {/* Hero Content */}
+            <div className="relative z-10 h-full flex flex-col justify-center px-6 sm:px-10">
+              <span className="text-emerald-400 uppercase tracking-[0.3em] text-xs sm:text-sm font-bold">
+                Cricket Tournament
+              </span>
+
+              <h2 className="mt-3 text-3xl sm:text-5xl font-black text-white">
+                Match Fixtures
+              </h2>
+
+              <p className="mt-3 text-slate-300 max-w-2xl text-sm sm:text-lg">
+                View upcoming matches, live games, completed results, and
+                tournament progress.
+              </p>
+            </div>
+          </div>
+
+          {/* Fixtures Heading */}
+          <div className="flex items-center justify-between mt-2">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                Tournament Fixtures
+              </h2>
+
+              <p className="text-slate-400 mt-1">Complete match schedule</p>
+            </div>
           </div>
 
           {/* Match Cards */}
-          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {data.matches.map((m) => (
               <div
                 key={m.id}
-                className="bg-[#0d1735]/90 border border-slate-800 rounded-3xl p-5 shadow-2xl hover:border-emerald-500/40 transition"
+                className="bg-linear-to-br from-[#0d1735] to-[#111c40]
+                 border border-slate-800 rounded-3xl p-6
+                 shadow-xl hover:shadow-emerald-500/10
+                 hover:border-emerald-500/30
+                 hover:-translate-y-1
+                 transition-all duration-300"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-sm font-bold">
+                {/* Top */}
+                <div className="flex items-center justify-between mb-5">
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold uppercase tracking-wide">
                     Match {m.match_no}
                   </span>
 
                   <span className="text-slate-400 text-sm">{m.round_name}</span>
                 </div>
 
-                <h3 className="text-xl font-bold text-white leading-relaxed">
-                  {m.team_a_name}
-                </h3>
+                {/* Team A */}
+                <div className="text-center">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">
+                    {m.team_a_name}
+                  </h3>
+                </div>
 
-                <p className="text-center text-emerald-400 font-bold my-3">
-                  VS
-                </p>
+                {/* VS */}
+                <div className="flex items-center gap-3 my-5">
+                  <div className="flex-1 h-px bg-slate-700" />
+                  <span className="text-emerald-400 font-black tracking-widest">
+                    VS
+                  </span>
+                  <div className="flex-1 h-px bg-slate-700" />
+                </div>
 
-                <h3 className="text-xl font-bold text-white leading-relaxed">
-                  {m.team_b_name}
-                </h3>
+                {/* Team B */}
+                <div className="text-center">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">
+                    {m.team_b_name}
+                  </h3>
+                </div>
 
-                <div className="mt-5">
+                {/* Status */}
+                <div className="flex justify-center mt-6">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
+                    className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide ${
                       m.status === "completed"
-                        ? "bg-blue-500/15 text-blue-400"
+                        ? "bg-blue-500/15 text-blue-400 border border-blue-500/20"
                         : m.status === "active"
-                          ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-amber-500/15 text-amber-400"
+                          ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
+                          : "bg-amber-500/15 text-amber-400 border border-amber-500/20"
                     }`}
                   >
                     {m.status}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mt-6">
+                {/* Buttons */}
+                <div className="grid grid-cols-2 gap-3 mt-8">
                   <Link
                     to={`/matches/${m.id}/admin`}
-                    className="h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold flex items-center justify-center transition"
+                    className="h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400
+                     text-slate-950 font-bold flex items-center justify-center
+                     transition"
                   >
-                    Admin Score
+                    Admin
                   </Link>
 
                   <Link
                     to={`/matches/${m.id}/live`}
-                    className="h-12 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-center transition"
+                    className="h-12 rounded-xl bg-slate-800 hover:bg-slate-700
+                     border border-slate-700
+                     text-white font-bold flex items-center justify-center
+                     transition"
                   >
                     Live View
                   </Link>
