@@ -31,15 +31,16 @@ export default function Dashboard() {
       <main className="relative min-h-screen overflow-hidden text-white">
         {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-fixed"
           style={{
             backgroundImage:
               "url('https://i.pinimg.com/736x/9d/98/97/9d9897e66dcbade91c24545d00053320.jpg')",
+            filter: "brightness(1.1)",
           }}
         />
 
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-[#071028]/90 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-[#071028]/50 backdrop-blur-[1px]" />
 
         {/* Content */}
         <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-5 sm:py-10">
@@ -115,7 +116,7 @@ export default function Dashboard() {
             </section>
 
             {/* Tournament List */}
-            <section className="bg-[#0d1735]/85 backdrop-blur-md border border-slate-700 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl">
+            <section className="bg-slate-900/45 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold">
@@ -152,19 +153,7 @@ export default function Dashboard() {
                     <Link
                       key={t.id}
                       to={`/tournaments/${t.id}`}
-                      className="
-                  group
-                  rounded-2xl
-                  bg-[#111c40]/80
-                  backdrop-blur-md
-                  border border-slate-700
-                  p-4 sm:p-5
-                  hover:border-emerald-500/40
-                  hover:-translate-y-1
-                  hover:shadow-xl
-                  hover:shadow-emerald-500/20
-                  transition-all duration-300
-                "
+                      className="group rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/10 p-4 sm:p-5 hover:border-emerald-500/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
@@ -216,7 +205,7 @@ function StatCard({ title, value, icon, accent = "slate" }) {
   };
 
   return (
-    <div className="rounded-2xl bg-[#0d1735] border border-slate-800 p-4 sm:p-5 shadow-xl">
+    <div className="rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/10 p-4 sm:p-5 shadow-xl">
       <div className="flex items-center justify-between">
         <p className="text-xs sm:text-sm text-slate-400 font-medium">{title}</p>
 
@@ -234,7 +223,7 @@ function StatCard({ title, value, icon, accent = "slate" }) {
 
 function InfoBox({ label, value }) {
   return (
-    <div className="rounded-xl bg-[#071028]/80 border border-slate-800 p-3">
+    <div className="rounded-xl bg-slate-900/40 backdrop-blur-xl border border-white/10 p-3">
       <p className="text-xs sm:text-sm text-slate-500">{label}</p>
 
       <p className="font-semibold capitalize mt-1 wrap-break-words">{value}</p>
