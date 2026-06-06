@@ -90,6 +90,47 @@ export default function TournamentDetails() {
             </div>
           </div>
 
+          
+
+          {/* Fixtures Hero */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-800 shadow-2xl h-64 sm:h-80 lg:h-96">
+            <img
+              src="https://www.sakshi.com/gallery_images/2023/11/18/Captains%20Rohit%20Sharma%20and%20Pat%20Cummins%20with%20the%20trophy%20ahead%20of%202023%20World%20Cup%20final%20Photos_8.jpg"
+              alt="Tournament Fixtures"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-linear-to-r from-[#071028]/95 via-[#071028]/75 to-[#071028]/20" />
+
+            {/* Hero Content */}
+            <div className="relative z-10 h-full flex flex-col justify-center px-6 sm:px-10">
+              <span className="text-emerald-400 uppercase tracking-[0.3em] text-xs sm:text-sm font-bold">
+                Cricket Tournament
+              </span>
+
+              <h2 className="mt-3 text-3xl sm:text-5xl font-black text-white">
+                Match Fixtures
+              </h2>
+
+              <p className="mt-3 text-slate-300 max-w-2xl text-sm sm:text-lg">
+                View upcoming matches, live games, completed results, and
+                tournament progress.
+              </p>
+            </div>
+          </div>
+
+          {/* Fixtures Heading */}
+          <div className="flex items-center justify-between mt-2">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                Tournament Fixtures
+              </h2>
+
+              <p className="text-slate-400 mt-1">Complete match schedule</p>
+            </div>
+          </div>
+
           {/* Points Table */}
           <section className="bg-[#0d1735]/90 border border-slate-800 rounded-3xl p-5 sm:p-8 shadow-2xl">
             <h2 className="text-2xl font-bold text-white mb-6">Points Table</h2>
@@ -134,45 +175,6 @@ export default function TournamentDetails() {
               </table>
             </div>
           </section>
-
-          {/* Fixtures Hero */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-800 shadow-2xl h-64 sm:h-80 lg:h-96">
-            <img
-              src="https://www.sakshi.com/gallery_images/2023/11/18/Captains%20Rohit%20Sharma%20and%20Pat%20Cummins%20with%20the%20trophy%20ahead%20of%202023%20World%20Cup%20final%20Photos_8.jpg"
-              alt="Tournament Fixtures"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-linear-to-r from-[#071028]/95 via-[#071028]/75 to-[#071028]/20" />
-
-            {/* Hero Content */}
-            <div className="relative z-10 h-full flex flex-col justify-center px-6 sm:px-10">
-              <span className="text-emerald-400 uppercase tracking-[0.3em] text-xs sm:text-sm font-bold">
-                Cricket Tournament
-              </span>
-
-              <h2 className="mt-3 text-3xl sm:text-5xl font-black text-white">
-                Match Fixtures
-              </h2>
-
-              <p className="mt-3 text-slate-300 max-w-2xl text-sm sm:text-lg">
-                View upcoming matches, live games, completed results, and
-                tournament progress.
-              </p>
-            </div>
-          </div>
-
-          {/* Fixtures Heading */}
-          <div className="flex items-center justify-between mt-2">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">
-                Tournament Fixtures
-              </h2>
-
-              <p className="text-slate-400 mt-1">Complete match schedule</p>
-            </div>
-          </div>
 
           {/* Match Cards */}
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
