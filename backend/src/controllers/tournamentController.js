@@ -105,7 +105,7 @@ export async function deleteTournament(req, res) {
       message: "Tournament deleted successfully",
     });
   } catch (err) {
-    console.error(err);
+    console.error("DELETE ERROR:", err.message, err);
 
     res.status(500).json({
       message: "Failed to delete tournament",
