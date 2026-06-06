@@ -85,12 +85,12 @@ export default function CreateTournament() {
             </div>
           </div>
 
-          /* Form */
+          
           <form
             onSubmit={submit}
             className="bg-[#0d1735] border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl space-y-6"
           >
-            /* Tournament Name */
+            
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">
                 Tournament Name
@@ -117,7 +117,7 @@ export default function CreateTournament() {
               />
             </div>
 
-            /* Mode + Overs */
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
 
               <div>
@@ -176,7 +176,7 @@ export default function CreateTournament() {
               </div>
             </div>
 
-            /* Teams */
+            
             <div>
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
@@ -266,7 +266,7 @@ export default function CreateTournament() {
               </div>
             </div>
 
-            /* Submit */
+            
             <button
               className="
                 w-full
