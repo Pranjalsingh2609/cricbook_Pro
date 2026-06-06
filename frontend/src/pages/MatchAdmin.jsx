@@ -200,29 +200,37 @@ export default function MatchAdmin() {
             </select>
 
             {/* Runs */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3 sm:gap-5">
               {[0, 1, 2, 3, 4, 6].map((r) => (
                 <button
                   key={r}
                   onClick={() => ball(r)}
-                  className="h-20 rounded-3xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-3xl transition active:scale-95"
+                  className=" h-24 sm:h-28 md:h-32 rounded-3xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-4xl sm:text-5xl shadow-lg transition active:scale-95 "
                 >
                   {r}
                 </button>
               ))}
             </div>
 
-            {/* Extras Row */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Extras */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-5">
               <button
-                className="h-20 rounded-3xl bg-blue-500 hover:bg-blue-400 text-lg font-bold transition active:scale-95"
+                className=" h-20 sm:h-24 md:h-28 rounded-3xl bg-blue-500 hover:bg-blue-400 text-base sm:text-xl md:text-2xl font-bold shadow-Lg transition active:scale-95 "
                 onClick={() => ball(0, 1, "wide")}
               >
                 Wide Ball
               </button>
 
               <button
-                className="h-20 rounded-3xl bg-purple-500 hover:bg-purple-400 text-lg font-bold transition active:scale-95"
+                className="
+                    h-20 sm:h-24 md:h-28
+                    rounded-3xl
+                  bg-purple-500 hover:bg-purple-400
+                    text-base sm:text-xl md:text-2xl
+                    font-bold
+                    shadow-lg
+                    transition active:scale-95
+                    "
                 onClick={() => ball(0, 1, "no_ball")}
               >
                 No Ball
@@ -230,16 +238,25 @@ export default function MatchAdmin() {
             </div>
 
             {/* Wicket / Undo */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5">
               <button
-                className="h-20 rounded-3xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-lg font-bold transition active:scale-95"
+                className="
+                    h-20 sm:h-24 md:h-28
+                    rounded-3xl
+                    bg-amber-500 hover:bg-amber-400
+                    text-slate-950
+                    text-base sm:text-xl md:text-2xl
+                    font-bold
+                    shadow-lg
+                    transition active:scale-95
+                   "
                 onClick={() => ball(0, 0, null, true)}
               >
                 Wicket
               </button>
 
               <button
-                className="h-20 rounded-3xl bg-red-500 hover:bg-red-400 text-lg font-bold transition active:scale-95"
+                className=" h-20 sm:h-24 md:h-28 rounded-3xl bg-red-500 hover:bg-red-400 text-base sm:text-xl md:text-2xl font-bold shadow-lg transition active:scale-95 "
                 onClick={undo}
               >
                 Undo
