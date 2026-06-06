@@ -74,7 +74,8 @@ export default function MatchAdmin() {
     (i) => Number(i.innings_no) === Number(inningsNo),
   );
 
-  const battingTeamName = current?.batting_team_name || current?.battingTeamName || "Batting";
+  const battingTeamName =
+    current?.batting_team_name || current?.battingTeamName || "Batting";
 
   const secondInningsExists =
     summary?.innings?.some((i) => Number(i.innings_no) === 2) || false;
@@ -164,8 +165,11 @@ export default function MatchAdmin() {
                 </h3>
               </div>
 
-              
               <div className="text-center">
+                <h3 className="text-xl sm:text-3xl font-bold text-white mb-2">
+                  {battingTeamName}
+                </h3>
+
                 <h2 className="text-5xl sm:text-7xl font-black text-emerald-400">
                   {current ? `${current.runs}/${current.wickets}` : "--/--"}
                 </h2>
@@ -196,43 +200,46 @@ export default function MatchAdmin() {
             </select>
 
             {/* Runs */}
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               {[0, 1, 2, 3, 4, 6].map((r) => (
                 <button
                   key={r}
                   onClick={() => ball(r)}
-                  className="h-20 sm:h-24 rounded-3xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-2xl sm:text-3xl transition active:scale-95"
+                  className="h-20 rounded-3xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-3xl transition active:scale-95"
                 >
                   {r}
                 </button>
               ))}
             </div>
 
-            {/* Extras */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {/* Extras Row */}
+            <div className="grid grid-cols-2 gap-4">
               <button
-                className="h-20 sm:h-24 rounded-3xl bg-blue-500 hover:bg-blue-400 text-lg sm:text-xl font-bold transition active:scale-95"
+                className="h-20 rounded-3xl bg-blue-500 hover:bg-blue-400 text-lg font-bold transition active:scale-95"
                 onClick={() => ball(0, 1, "wide")}
               >
-                Wide +1
+                Wide Ball
               </button>
 
               <button
-                className="h-20 sm:h-24 rounded-3xl bg-purple-500 hover:bg-purple-400 text-lg sm:text-xl font-bold transition active:scale-95"
+                className="h-20 rounded-3xl bg-purple-500 hover:bg-purple-400 text-lg font-bold transition active:scale-95"
                 onClick={() => ball(0, 1, "no_ball")}
               >
-                No Ball +1
+                No Ball
               </button>
+            </div>
 
+            {/* Wicket / Undo */}
+            <div className="grid grid-cols-2 gap-4">
               <button
-                className="h-20 sm:h-24 rounded-3xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-lg sm:text-xl font-bold transition active:scale-95"
+                className="h-20 rounded-3xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-lg font-bold transition active:scale-95"
                 onClick={() => ball(0, 0, null, true)}
               >
                 Wicket
               </button>
 
               <button
-                className="h-20 sm:h-24 rounded-3xl bg-red-500 hover:bg-red-400 text-lg sm:text-xl font-bold transition active:scale-95"
+                className="h-20 rounded-3xl bg-red-500 hover:bg-red-400 text-lg font-bold transition active:scale-95"
                 onClick={undo}
               >
                 Undo
