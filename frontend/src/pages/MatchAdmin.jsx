@@ -39,7 +39,7 @@ export default function MatchAdmin() {
     runsBat,
     extraRuns = 0,
     extraType = null,
-    isWicket = false
+    isWicket = false,
   ) {
     await api.post(`/matches/${id}/ball`, {
       inningsNo: Number(inningsNo),
@@ -71,13 +71,13 @@ export default function MatchAdmin() {
   const { matchData, summary } = data;
 
   const current = summary?.innings?.find(
-    (i) => Number(i.innings_no) === Number(inningsNo)
+    (i) => Number(i.innings_no) === Number(inningsNo),
   );
 
+  const battingTeamName = current?.batting_team_name || current?.battingTeamName || "Batting";
+
   const secondInningsExists =
-    summary?.innings?.some(
-      (i) => Number(i.innings_no) === 2
-    ) || false;
+    summary?.innings?.some((i) => Number(i.innings_no) === 2) || false;
 
   return (
     <>
@@ -94,7 +94,6 @@ export default function MatchAdmin() {
         <div className="absolute inset-0 bg-[#071028]/85 backdrop-blur-sm" />
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 py-6 sm:px-6 sm:py-8 space-y-5">
-
           {/* Match Header */}
           <div className="rounded-3xl bg-[#0d1735]/90 border border-slate-800 p-5 sm:p-8 shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
@@ -107,9 +106,7 @@ export default function MatchAdmin() {
                   {matchData.match.team_a_name}
                 </h1>
 
-                <p className="text-emerald-400 font-bold text-lg">
-                  VS
-                </p>
+                <p className="text-emerald-400 font-bold text-lg">VS</p>
 
                 <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
                   {matchData.match.team_b_name}
@@ -138,18 +135,14 @@ export default function MatchAdmin() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <button
                   className="h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition"
-                  onClick={() =>
-                    start(matchData.match.team_a_id)
-                  }
+                  onClick={() => start(matchData.match.team_a_id)}
                 >
                   {matchData.match.team_a_name}
                 </button>
 
                 <button
                   className="h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition"
-                  onClick={() =>
-                    start(matchData.match.team_b_id)
-                  }
+                  onClick={() => start(matchData.match.team_b_id)}
                 >
                   {matchData.match.team_b_name}
                 </button>
@@ -158,49 +151,57 @@ export default function MatchAdmin() {
           )}
 
           {/* Score */}
-          <div className="rounded-3xl bg-[#0d1735]/90 border border-slate-800 p-5 sm:p-8 shadow-2xl text-center">
-            <h2 className="text-4xl sm:text-6xl font-black text-emerald-400">
-              {current
-                ? `${current.runs}/${current.wickets}`
-                : "--/--"}
-            </h2>
+          <div className="rounded-3xl bg-[#0d1735]/90 border border-slate-800 p-5 sm:p-8 shadow-2xl">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Batting Team */}
+              <div className="text-center sm:text-left">
+                <p className="text-slate-400 text-sm uppercase tracking-wider">
+                  Batting
+                </p>
 
-            <p className="text-lg sm:text-2xl text-white mt-2">
-              Overs: {current?.overs || "0.0"}
-            </p>
+                <h3 className="text-xl sm:text-3xl font-bold text-white">
+                  {battingTeamName}
+                </h3>
+              </div>
 
-            <p className="text-slate-400 mt-2">
-              Run Rate: {current?.runRate || "0.00"}
+              
+              <div className="text-center">
+                <h2 className="text-5xl sm:text-7xl font-black text-emerald-400">
+                  {current ? `${current.runs}/${current.wickets}` : "--/--"}
+                </h2>
 
-              {current?.requiredRate &&
-                ` • Required RR: ${current.requiredRate}`}
-            </p>
+                <p className="text-lg sm:text-2xl text-white mt-2">
+                  Overs: {current?.overs || "0.0"}
+                </p>
+
+                <p className="text-slate-400 mt-2">
+                  Run Rate: {current?.runRate || "0.00"}
+                  {current?.requiredRate &&
+                    ` • Required RR: ${current.requiredRate}`}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Controls */}
           <div className="rounded-3xl bg-[#0d1735]/90 border border-slate-800 p-5 sm:p-8 shadow-2xl space-y-6">
-
             <select
               className="w-full sm:w-60 h-12 rounded-xl bg-[#111c40] border border-slate-700 px-4 text-white"
               value={inningsNo}
-              onChange={(e) =>
-                setInningsNo(Number(e.target.value))
-              }
+              onChange={(e) => setInningsNo(Number(e.target.value))}
             >
               <option value={1}>1st Innings</option>
 
-              {secondInningsExists && (
-                <option value={2}>2nd Innings</option>
-              )}
+              {secondInningsExists && <option value={2}>2nd Innings</option>}
             </select>
 
             {/* Runs */}
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
               {[0, 1, 2, 3, 4, 6].map((r) => (
                 <button
                   key={r}
                   onClick={() => ball(r)}
-                  className="h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xl transition"
+                  className="h-20 sm:h-24 rounded-3xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-2xl sm:text-3xl transition active:scale-95"
                 >
                   {r}
                 </button>
@@ -208,36 +209,34 @@ export default function MatchAdmin() {
             </div>
 
             {/* Extras */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <button
-                className="h-14 rounded-2xl bg-blue-500 hover:bg-blue-400 font-bold transition"
+                className="h-20 sm:h-24 rounded-3xl bg-blue-500 hover:bg-blue-400 text-lg sm:text-xl font-bold transition active:scale-95"
                 onClick={() => ball(0, 1, "wide")}
               >
                 Wide +1
               </button>
 
               <button
-                className="h-14 rounded-2xl bg-purple-500 hover:bg-purple-400 font-bold transition"
+                className="h-20 sm:h-24 rounded-3xl bg-purple-500 hover:bg-purple-400 text-lg sm:text-xl font-bold transition active:scale-95"
                 onClick={() => ball(0, 1, "no_ball")}
               >
                 No Ball +1
               </button>
 
               <button
-                className="h-14 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition"
+                className="h-20 sm:h-24 rounded-3xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-lg sm:text-xl font-bold transition active:scale-95"
                 onClick={() => ball(0, 0, null, true)}
               >
                 Wicket
               </button>
 
               <button
-                className="h-14 rounded-2xl bg-red-500 hover:bg-red-400 font-bold transition"
+                className="h-20 sm:h-24 rounded-3xl bg-red-500 hover:bg-red-400 text-lg sm:text-xl font-bold transition active:scale-95"
                 onClick={undo}
               >
                 Undo
               </button>
-
             </div>
           </div>
         </div>
