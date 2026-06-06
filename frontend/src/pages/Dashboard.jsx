@@ -7,6 +7,7 @@ import {
   FileText,
   CheckCircle,
   ArrowRight,
+  Trash2,
 } from "lucide-react";
 
 import Navbar from "../components/Navbar";
@@ -23,6 +24,26 @@ export default function Dashboard() {
   const active = items.filter((t) => t.status === "active").length;
   const completed = items.filter((t) => t.status === "completed").length;
   const draft = items.filter((t) => t.status === "draft").length;
+
+  const handleDelete = async (id, e) => {
+    e.preventDefault(); // Prevent Link navigation
+    e.stopPropagation();
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this tournament?",
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/tournaments/${id}`);
+
+      setItems((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete tournament.");
+    }
+  };
 
   return (
     <>
@@ -116,7 +137,7 @@ export default function Dashboard() {
             </section>
 
             {/* Tournament List */}
-            <section className="bg-slate-900/45 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl">
+            <section className="bg-slate-900/55 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold">
@@ -153,7 +174,7 @@ export default function Dashboard() {
                     <Link
                       key={t.id}
                       to={`/tournaments/${t.id}`}
-                      className="group rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/10 p-4 sm:p-5 hover:border-emerald-500/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300"
+                      className="group rounded-2xl bg-slate-900/50 border border-white/10 p-4 sm:p-5 hover:border-emerald-500/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
@@ -166,7 +187,17 @@ export default function Dashboard() {
                           </p>
                         </div>
 
-                        <StatusBadge status={t.status} />
+                        <div className="flex items-center gap-2">
+                          <StatusBadge status={t.status} />
+
+                          <button
+                            onClick={(e) => handleDelete(t.id, e)}
+                            className="p-2 rounded-lg bg-red-500/15 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition"
+                            title="Delete Tournament"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 mt-5">
@@ -205,7 +236,7 @@ function StatCard({ title, value, icon, accent = "slate" }) {
   };
 
   return (
-    <div className="rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/10 p-4 sm:p-5 shadow-xl">
+    <div className="group rounded-2xl bg-slate-900/50 border border-white/10 p-4 sm:p-5 hover:border-emerald-500/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300">
       <div className="flex items-center justify-between">
         <p className="text-xs sm:text-sm text-slate-400 font-medium">{title}</p>
 
@@ -223,7 +254,7 @@ function StatCard({ title, value, icon, accent = "slate" }) {
 
 function InfoBox({ label, value }) {
   return (
-    <div className="rounded-xl bg-slate-900/40 backdrop-blur-xl border border-white/10 p-3">
+    <div className="rounded-xl bg-slate-900/50 border border-white/10 p-3">
       <p className="text-xs sm:text-sm text-slate-500">{label}</p>
 
       <p className="font-semibold capitalize mt-1 wrap-break-words">{value}</p>
