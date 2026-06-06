@@ -35,10 +35,10 @@ export default function Login() {
 return (
   <main
     className="min-h-screen flex items-center justify-center px-4 py-6 relative overflow-hidden bg-cover bg-center bg-no-repeat"
-    style={{
-      backgroundImage:
-        "url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvBdTlpBx0KeDyHKX24HV-2MWt6yDBRlHPrw&s')",
-    }}
+style={{
+  backgroundImage:
+    "url('https://img.magnific.com/premium-vector/cricket-championship-design-concept-with-vector-illustration_30996-8233.jpg?semt=ais_hybrid&w=740&q=80')",
+}}
   >
     {/* Dark Overlay */}
     <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-[2px]" />
