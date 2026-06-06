@@ -1,22 +1,33 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trophy, Users, Plus, ChevronRight, Trash2 } from "lucide-react";
+import {
+  Trophy,
+  Users,
+  Plus,
+  ChevronRight,
+  Trash2,
+} from "lucide-react";
 
 import Navbar from "../components/Navbar";
 import { api } from "../api/client";
 
 export default function CreateTournament() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("College Premier League");
   const [mode, setMode] = useState("league");
   const [overs, setOvers] = useState(10);
-  const [teams, setTeams] = useState(["Team A", "Team B", "Team C", "Team D"]);
+  const [teams, setTeams] = useState([
+    "Team A",
+    "Team B",
+    "Team C",
+    "Team D",
+  ]);
 
-  const navigate = useNavigate();
-
-  function changeTeam(i, value) {
-    const next = [...teams];
-    next[i] = value;
-    setTeams(next);
+  function changeTeam(index, value) {
+    const updated = [...teams];
+    updated[index] = value;
+    setTeams(updated);
   }
 
   function removeTeam(index) {
@@ -35,7 +46,9 @@ export default function CreateTournament() {
       name,
       mode,
       overs: Number(overs),
-      teams: teams.filter(Boolean).map((t) => ({ name: t })),
+      teams: teams.filter(Boolean).map((t) => ({
+        name: t,
+      })),
     };
 
     const { data } = await api.post("/tournaments", payload);
@@ -47,66 +60,93 @@ export default function CreateTournament() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-[#071028] px-4 py-10">
+      <main className="min-h-screen bg-[#071028] px-4 py-6 sm:py-10">
         <div className="max-w-4xl mx-auto">
-          {/* HEADER */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center">
-                <Trophy className="text-emerald-400" size={28} />
+
+          /* Header */
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center">
+                <Trophy
+                  className="text-emerald-400"
+                  size={24}
+                />
               </div>
 
               <div>
-                <h1 className="text-4xl font-extrabold text-white">
+                <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
                   Create Tournament
                 </h1>
 
-                <p className="text-slate-400 mt-1">
+                <p className="text-sm sm:text-base text-slate-400 mt-1">
                   Organize your cricket tournament professionally
                 </p>
               </div>
             </div>
           </div>
 
-          {/* FORM */}
+          /* Form */
           <form
             onSubmit={submit}
-            className="bg-[#0d1735] border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-8"
+            className="bg-[#0d1735] border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl space-y-6"
           >
-            {/* TOURNAMENT NAME */}
+            /* Tournament Name */
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">
                 Tournament Name
               </label>
 
               <input
-                className="w-full h-14 px-5 rounded-xl bg-[#111c40] border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter tournament name"
+                className="
+                  w-full
+                  h-12 sm:h-14
+                  px-4 sm:px-5
+                  rounded-xl
+                  bg-[#111c40]
+                  border border-slate-700
+                  text-white
+                  placeholder:text-slate-500
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-emerald-500
+                  transition
+                "
               />
             </div>
 
-            {/* MODE + OVERS */}
-            <div className="grid md:grid-cols-2 gap-5">
+            /* Mode + Overs */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
                   Tournament Mode
                 </label>
 
                 <select
-                  className="w-full h-14 px-5 rounded-xl bg-[#111c40] border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                   value={mode}
                   onChange={(e) => setMode(e.target.value)}
+                  className="
+                    w-full
+                    h-12 sm:h-14
+                    px-4 sm:px-5
+                    rounded-xl
+                    bg-[#111c40]
+                    border border-slate-700
+                    text-white
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-emerald-500
+                  "
                 >
                   <option value="single">Single Match</option>
-
                   <option value="league">League</option>
-
                   <option value="knockout">Knockout</option>
-
-                  <option value="league_knockout">League + Knockout</option>
-
+                  <option value="league_knockout">
+                    League + Knockout
+                  </option>
                   <option value="custom">Custom</option>
                 </select>
               </div>
@@ -118,50 +158,107 @@ export default function CreateTournament() {
 
                 <input
                   type="number"
-                  className="w-full h-14 px-5 rounded-xl bg-[#111c40] border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                   value={overs}
                   onChange={(e) => setOvers(e.target.value)}
-                  placeholder="Overs"
+                  className="
+                    w-full
+                    h-12 sm:h-14
+                    px-4 sm:px-5
+                    rounded-xl
+                    bg-[#111c40]
+                    border border-slate-700
+                    text-white
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-emerald-500
+                  "
                 />
               </div>
             </div>
 
-            {/* TEAMS */}
+            /* Teams */
             <div>
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-2">
-                  <Users className="text-emerald-400" size={20} />
 
-                  <h2 className="text-xl font-bold text-white">Teams</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+
+                <div className="flex items-center gap-2">
+                  <Users
+                    className="text-emerald-400"
+                    size={20}
+                  />
+
+                  <h2 className="text-lg sm:text-xl font-bold text-white">
+                    Teams
+                  </h2>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setTeams([...teams, ""])}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold transition-all duration-200 hover:scale-105"
+                  className="
+                    w-full sm:w-auto
+                    flex items-center justify-center gap-2
+                    px-4 py-3
+                    rounded-xl
+                    bg-emerald-500
+                    hover:bg-emerald-400
+                    text-black
+                    font-semibold
+                    transition
+                  "
                 >
                   <Plus size={18} />
                   Add Team
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                {teams.map((t, i) => (
-                  <div key={i} className="flex items-center gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {teams.map((team, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2"
+                  >
                     <input
-                      className="flex-1 h-14 px-5 rounded-xl bg-[#111c40] border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
-                      value={t}
-                      onChange={(e) => changeTeam(i, e.target.value)}
-                      placeholder={`Team ${i + 1}`}
+                      value={team}
+                      onChange={(e) =>
+                        changeTeam(index, e.target.value)
+                      }
+                      placeholder={`Team ${index + 1}`}
+                      className="
+                        flex-1
+                        h-12 sm:h-14
+                        px-4 sm:px-5
+                        rounded-xl
+                        bg-[#111c40]
+                        border border-slate-700
+                        text-white
+                        placeholder:text-slate-500
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-emerald-500
+                      "
                     />
 
                     {teams.length > 2 && (
                       <button
                         type="button"
-                        onClick={() => removeTeam(i)}
-                        className="w-14 h-14 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition flex items-center justify-center"
+                        onClick={() => removeTeam(index)}
+                        className="
+                          w-12 h-12
+                          sm:w-14 sm:h-14
+                          rounded-xl
+                          bg-red-500/10
+                          border border-red-500/30
+                          text-red-400
+                          hover:bg-red-500
+                          hover:text-white
+                          transition
+                          flex items-center justify-center
+                          shrink-0
+                        "
                       >
-                        <Trash2 size={20} />
+                        <Trash2 size={18} />
                       </button>
                     )}
                   </div>
@@ -169,11 +266,26 @@ export default function CreateTournament() {
               </div>
             </div>
 
-            {/* BUTTON */}
-            <button className="w-full h-14 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-lg font-bold flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-emerald-500/20">
+            /* Submit */
+            <button
+              className="
+                w-full
+                h-12 sm:h-14
+                rounded-xl
+                bg-emerald-500
+                hover:bg-emerald-400
+                text-black
+                text-base sm:text-lg
+                font-bold
+                flex items-center justify-center gap-2
+                transition
+                shadow-lg shadow-emerald-500/20
+              "
+            >
               Save Tournament
               <ChevronRight size={20} />
             </button>
+
           </form>
         </div>
       </main>

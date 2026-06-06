@@ -137,9 +137,9 @@ export async function addBall(req, res) {
     ]
   );
 
-  // =========================
+
   // SECOND INNINGS CHASE CHECK
-  // =========================
+
   if (Number(inningsNo) === 2) {
 
     const firstInningsResult = await query(
@@ -190,9 +190,9 @@ export async function addBall(req, res) {
     }
   }
 
-  // =========================
+
   // OVERS LIMIT
-  // =========================
+
   const matchResult = await query(
     `SELECT m.*, t.overs
      FROM matches m
@@ -211,9 +211,9 @@ export async function addBall(req, res) {
     validBalls >= ballsLimit ||
     wickets >= 10;
 
-  // =========================
+
   // INNINGS COMPLETE
-  // =========================
+
   if (inningsFinished) {
 
     // FIRST INNINGS COMPLETE

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Trophy } from "lucide-react";
+
 import Navbar from "../components/Navbar";
 import { api } from "../api/client";
 
@@ -37,7 +39,7 @@ export default function MatchAdmin() {
     runsBat,
     extraRuns = 0,
     extraType = null,
-    isWicket = false,
+    isWicket = false
   ) {
     await api.post(`/matches/${id}/ball`, {
       inningsNo: Number(inningsNo),
@@ -59,113 +61,184 @@ export default function MatchAdmin() {
   }
 
   if (isLoading || !data) {
-    return <p className="p-6">Loading...</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#071028] text-white">
+        Loading...
+      </div>
+    );
   }
 
   const { matchData, summary } = data;
 
   const current = summary?.innings?.find(
-    (i) => Number(i.innings_no) === Number(inningsNo),
+    (i) => Number(i.innings_no) === Number(inningsNo)
   );
 
   const secondInningsExists =
-    summary?.innings?.some((i) => Number(i.innings_no) === 2) || false;
+    summary?.innings?.some(
+      (i) => Number(i.innings_no) === 2
+    ) || false;
 
   return (
     <>
       <Navbar />
 
-      <main className="p-4 sm:p-6 max-w-5xl mx-auto space-y-5">
-        <div className="card">
-          <h1 className="text-2xl sm:text-3xl font-bold">
-            {matchData.match.team_a_name} vs {matchData.match.team_b_name}
-          </h1>
+      <main
+        className="min-h-screen bg-cover bg-center bg-fixed relative"
+        style={{
+          backgroundImage:
+            "url('https://t4.ftcdn.net/jpg/11/81/03/43/360_F_1181034352_8YUOBN0p62I9qrGodQsAmbpPlMynmEax.jpg')",
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-[#071028]/85 backdrop-blur-sm" />
 
-          <p className="text-slate-400">Status: {matchData.match.status}</p>
+        <div className="relative z-10 max-w-5xl mx-auto px-4 py-6 sm:px-6 sm:py-8 space-y-5">
 
-          {matchData.match.status === "completed" && (
-            <div className="mt-4 rounded-xl bg-green-600 p-4 text-white text-xl font-bold">
-              🏆 Winner: {matchData.match.winner_team_name}
+          {/* Match Header */}
+          <div className="rounded-3xl bg-[#0d1735]/90 border border-slate-800 p-5 sm:p-8 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 flex items-center justify-center">
+                <Trophy className="text-emerald-400" size={28} />
+              </div>
+
+              <div>
+                <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
+                  {matchData.match.team_a_name}
+                </h1>
+
+                <p className="text-emerald-400 font-bold text-lg">
+                  VS
+                </p>
+
+                <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
+                  {matchData.match.team_b_name}
+                </h1>
+              </div>
+            </div>
+
+            <p className="text-slate-400 capitalize">
+              Status: {matchData.match.status}
+            </p>
+
+            {matchData.match.status === "completed" && (
+              <div className="mt-5 rounded-2xl bg-emerald-500 p-4 text-center text-slate-950 font-black text-lg sm:text-2xl">
+                🏆 Winner: {matchData.match.winner_team_name}
+              </div>
+            )}
+          </div>
+
+          {/* Start Match */}
+          {matchData.match.status === "scheduled" && (
+            <div className="rounded-3xl bg-[#0d1735]/90 border border-slate-800 p-5 sm:p-8 shadow-2xl">
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-5">
+                Select Batting First
+              </h2>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <button
+                  className="h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition"
+                  onClick={() =>
+                    start(matchData.match.team_a_id)
+                  }
+                >
+                  {matchData.match.team_a_name}
+                </button>
+
+                <button
+                  className="h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition"
+                  onClick={() =>
+                    start(matchData.match.team_b_id)
+                  }
+                >
+                  {matchData.match.team_b_name}
+                </button>
+              </div>
             </div>
           )}
-        </div>
 
-        {matchData.match.status === "scheduled" && (
-          <div className="card">
-            <h2 className="text-xl font-bold mb-3">
-              Start Match - Select Batting First
+          {/* Score */}
+          <div className="rounded-3xl bg-[#0d1735]/90 border border-slate-800 p-5 sm:p-8 shadow-2xl text-center">
+            <h2 className="text-4xl sm:text-6xl font-black text-emerald-400">
+              {current
+                ? `${current.runs}/${current.wickets}`
+                : "--/--"}
             </h2>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                className="btn"
-                onClick={() => start(matchData.match.team_a_id)}
-              >
-                {matchData.match.team_a_name}
-              </button>
+            <p className="text-lg sm:text-2xl text-white mt-2">
+              Overs: {current?.overs || "0.0"}
+            </p>
 
-              <button
-                className="btn"
-                onClick={() => start(matchData.match.team_b_id)}
-              >
-                {matchData.match.team_b_name}
-              </button>
-            </div>
-          </div>
-        )}
+            <p className="text-slate-400 mt-2">
+              Run Rate: {current?.runRate || "0.00"}
 
-        <div className="card">
-          <h2 className="text-xl sm:text-2xl font-bold">
-            Score:{" "}
-            {current
-              ? `${current.runs}/${current.wickets} (${current.overs})`
-              : "Not started"}
-          </h2>
-
-          <p className="text-slate-400">
-            Run Rate: {current?.runRate || "0.00"}
-            {current?.requiredRate && ` • Required: ${current.requiredRate}`}
-          </p>
-        </div>
-
-        <div className="card space-y-4">
-          <select
-            className="input max-w-xs"
-            value={inningsNo}
-            onChange={(e) => setInningsNo(Number(e.target.value))}
-          >
-            <option value={1}>1st Innings</option>
-
-            {secondInningsExists && <option value={2}>2nd Innings</option>}
-          </select>
-
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {[0, 1, 2, 3, 4, 6].map((r) => (
-              <button key={r} className="btn" onClick={() => ball(r)}>
-                {r}
-              </button>
-            ))}
+              {current?.requiredRate &&
+                ` • Required RR: ${current.requiredRate}`}
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <button className="btn" onClick={() => ball(0, 1, "wide")}>
-              Wide +1
-            </button>
+          {/* Controls */}
+          <div className="rounded-3xl bg-[#0d1735]/90 border border-slate-800 p-5 sm:p-8 shadow-2xl space-y-6">
 
-            <button className="btn" onClick={() => ball(0, 1, "no_ball")}>
-              No Ball +1
-            </button>
-
-            <button className="btn" onClick={() => ball(0, 0, null, true)}>
-              Wicket
-            </button>
-
-            <button
-              className="rounded-lg bg-red-500 px-4 py-2 font-bold"
-              onClick={undo}
+            <select
+              className="w-full sm:w-60 h-12 rounded-xl bg-[#111c40] border border-slate-700 px-4 text-white"
+              value={inningsNo}
+              onChange={(e) =>
+                setInningsNo(Number(e.target.value))
+              }
             >
-              Undo
-            </button>
+              <option value={1}>1st Innings</option>
+
+              {secondInningsExists && (
+                <option value={2}>2nd Innings</option>
+              )}
+            </select>
+
+            {/* Runs */}
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+              {[0, 1, 2, 3, 4, 6].map((r) => (
+                <button
+                  key={r}
+                  onClick={() => ball(r)}
+                  className="h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xl transition"
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+
+            {/* Extras */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
+              <button
+                className="h-14 rounded-2xl bg-blue-500 hover:bg-blue-400 font-bold transition"
+                onClick={() => ball(0, 1, "wide")}
+              >
+                Wide +1
+              </button>
+
+              <button
+                className="h-14 rounded-2xl bg-purple-500 hover:bg-purple-400 font-bold transition"
+                onClick={() => ball(0, 1, "no_ball")}
+              >
+                No Ball +1
+              </button>
+
+              <button
+                className="h-14 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition"
+                onClick={() => ball(0, 0, null, true)}
+              >
+                Wicket
+              </button>
+
+              <button
+                className="h-14 rounded-2xl bg-red-500 hover:bg-red-400 font-bold transition"
+                onClick={undo}
+              >
+                Undo
+              </button>
+
+            </div>
           </div>
         </div>
       </main>
