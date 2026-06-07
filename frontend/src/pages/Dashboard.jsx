@@ -108,17 +108,18 @@ export default function Dashboard() {
               <Link
                 to="/sports"
                 className="
-                   w-full sm:w-auto
-                   inline-flex items-center justify-center gap-2
-                   h-12 sm:h-14
-                   px-6
-                   rounded-xl
-                 bg-blue-500
-                 hover:bg-blue-400
-                 text-white
-                   font-bold
-                   transition-all duration-200
-                   shadow-lg
+            w-full sm:w-auto
+            inline-flex items-center justify-center gap-2
+            h-12 sm:h-14
+            px-6
+            rounded-xl
+            bg-emerald-500
+            hover:bg-emerald-400
+            text-slate-950
+            font-bold
+            transition-all duration-200
+            hover:scale-[1.02]
+            shadow-lg shadow-emerald-500/30
                     "
               >
                 🏆 Other Games
