@@ -12,7 +12,7 @@ export default function CreateTournament() {
   const [mode, setMode] = useState("league");
   const [overs, setOvers] = useState(10);
   const [teams, setTeams] = useState(["Team A", "Team B", "Team C", "Team D"]);
-
+  const [sport, setSport] = useState("cricket");
   function changeTeam(index, value) {
     const updated = [...teams];
     updated[index] = value;
@@ -32,9 +32,10 @@ export default function CreateTournament() {
     e.preventDefault();
 
     const payload = {
+      sport,
       name,
       mode,
-      overs: Number(overs),
+      overs: sport === "cricket" ? Number(overs) : null,
       teams: teams.filter(Boolean).map((t) => ({
         name: t,
       })),
@@ -45,6 +46,30 @@ export default function CreateTournament() {
     navigate(`/tournaments/${data.tournament.id}`);
   }
 
+
+  const sportImages = {
+  cricket:
+    "https://png.pngtree.com/thumb_back/fh260/background/20250705/pngtree-cricket-stadium-at-night-filled-with-spectators-and-bright-spotlights-illuminating-image_17468260.webp",
+
+  volleyball:
+    "https://images.unsplash.com/photo-1517649763962-0c623066013b",
+
+  football:
+    "https://images.unsplash.com/photo-1574629810360-7efbbe195018",
+
+  kabaddi:
+    "https://images.unsplash.com/photo-1547347298-4074fc3086f0",
+
+  hockey:
+    "https://images.unsplash.com/photo-1517466787929-bc90951d0974",
+
+  basketball:
+    "https://images.unsplash.com/photo-1546519638-68e109498ffc",
+
+  badminton:
+    "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea",
+};
+
   return (
     <>
       <Navbar />
@@ -53,7 +78,7 @@ export default function CreateTournament() {
         <div className="max-w-4xl mx-auto">
           <div className="relative mb-6 sm:mb-8 overflow-hidden rounded-3xl border border-slate-800 shadow-2xl">
             <img
-              src="https://png.pngtree.com/thumb_back/fh260/background/20250705/pngtree-cricket-stadium-at-night-filled-with-spectators-and-bright-spotlights-illuminating-image_17468260.webp"
+               src={sportImages[sport]}
               alt="Cricket Stadium"
               className="w-full h-52 sm:h-72 md:h-80 object-cover"
             />
@@ -66,11 +91,12 @@ export default function CreateTournament() {
               </div>
 
               <h1 className="text-3xl sm:text-5xl font-extrabold text-white">
-                Create Tournament
+                Create {sport.charAt(0).toUpperCase() + sport.slice(1)}{" "}
+                Tournament
               </h1>
 
               <p className="text-slate-200 text-sm sm:text-lg mt-2 max-w-md">
-                Organize your cricket tournament professionally
+                Organize your {sport} tournament professionally
               </p>
             </div>
           </div>
@@ -105,6 +131,37 @@ export default function CreateTournament() {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Sport
+              </label>
+
+              <select
+                value={sport}
+                onChange={(e) => setSport(e.target.value)}
+                className="
+                    w-full
+                     h-12 sm:h-14
+                    px-4 sm:px-5
+                    rounded-xl
+                 bg-[#111c40]
+                    border border-slate-700
+                    text-white
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-emerald-500
+                  "
+              >
+                <option value="cricket">🏏 Cricket</option>
+                <option value="volleyball">🏐 Volleyball</option>
+                <option value="kabaddi">🤼 Kabaddi</option>
+                <option value="football">⚽ Football</option>
+                <option value="hockey">🏑 Hockey</option>
+                <option value="basketball">🏀 Basketball</option>
+                <option value="badminton">🏸 Badminton</option>
+              </select>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -135,29 +192,31 @@ export default function CreateTournament() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Overs
-                </label>
+              {sport === "cricket" && (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    Overs
+                  </label>
 
-                <input
-                  type="number"
-                  value={overs}
-                  onChange={(e) => setOvers(e.target.value)}
-                  className="
-                    w-full
-                    h-12 sm:h-14
-                    px-4 sm:px-5
-                    rounded-xl
-                    bg-[#111c40]
-                    border border-slate-700
-                    text-white
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-emerald-500
-                  "
-                />
-              </div>
+                  <input
+                    type="number"
+                    value={overs}
+                    onChange={(e) => setOvers(e.target.value)}
+                    className="
+                        w-full
+                        h-12 sm:h-14
+                        px-4 sm:px-5
+                        rounded-xl
+                      bg-[#111c40]
+                        border border-slate-700
+                      text-white
+                        focus:outline-none
+                        focus:ring-2
+                      focus:ring-emerald-500
+                        "
+                  />
+                </div>
+              )}
             </div>
 
             <div>

@@ -19,6 +19,7 @@ import CreateTournament from "./pages/createTournament.jsx";
 import TournamentDetails from "./pages/TournamentDetails.jsx";
 import MatchAdmin from "./pages/MatchAdmin.jsx";
 import LiveMatch from "./pages/LiveMatch.jsx";
+import Sports from "./pages/Sports";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,8 @@ createRoot(document.getElementById("root")).render(
         />
 
         <Route path="/matches/:id/live" element={<LiveMatch />} />
+
+        <Route path="/sports" element={<Sports />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

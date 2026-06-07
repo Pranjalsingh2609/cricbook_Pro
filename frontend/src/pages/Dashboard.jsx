@@ -104,6 +104,25 @@ export default function Dashboard() {
                 <Plus size={20} />
                 Create Tournament
               </Link>
+
+              <Link
+                to="/sports"
+                className="
+                   w-full sm:w-auto
+                   inline-flex items-center justify-center gap-2
+                   h-12 sm:h-14
+                   px-6
+                   rounded-xl
+                 bg-blue-500
+                 hover:bg-blue-400
+                 text-white
+                   font-bold
+                   transition-all duration-200
+                   shadow-lg
+                    "
+              >
+                🏆 Other Games
+              </Link>
             </section>
 
             {/* Stats */}
