@@ -122,7 +122,8 @@ export default function Dashboard() {
             shadow-lg shadow-emerald-500/30
                     "
               >
-                  🏆 Other Games 
+                <Plus size={20} />
+                 🏆 Other Games 
               </Link>
             </section>
 
