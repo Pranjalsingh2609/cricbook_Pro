@@ -8,6 +8,10 @@ import { api } from "../api/client";
 
 export default function MatchAdmin() {
   const { id } = useParams();
+  const [batsmanId, setBatsmanId] = useState("");
+  const [nonStrikerId, setNonStrikerId] = useState("");
+  const [bowlerId, setBowlerId] = useState("");
+  const [batsmanOutId, setBatsmanOutId] = useState("");
   const [inningsNo, setInningsNo] = useState(1);
 
   const { data, isLoading, refetch } = useQuery({
@@ -22,6 +26,17 @@ export default function MatchAdmin() {
         matchData: matchRes.data,
         summary: summaryRes.data,
       };
+    },
+    enabled: !!id,
+  });
+
+  const { data: playersData } = useQuery({
+    queryKey: ["match-players", id, inningsNo],
+    queryFn: async () => {
+      const res = await api.get(
+        `/matches/${id}/players?inningsNo=${inningsNo}`,
+      );
+      return res.data;
     },
     enabled: !!id,
   });
@@ -41,8 +56,16 @@ export default function MatchAdmin() {
     extraType = null,
     isWicket = false,
   ) {
+    if (!batsmanId || !bowlerId) {
+      alert("Select batsman and bowler");
+      return;
+    }
+
     await api.post(`/matches/${id}/ball`, {
       inningsNo: Number(inningsNo),
+      batsmanId: Number(batsmanId),
+      bowlerId: Number(bowlerId),
+      batsmanOutId: isWicket ? Number(batsmanOutId) : null,
       runsBat,
       extraRuns,
       extraType,
@@ -178,6 +201,12 @@ export default function MatchAdmin() {
                   Overs: {current?.overs || "0.0"}
                 </p>
 
+                {summary.target && Number(inningsNo) === 2 && (
+                  <p className="text-amber-400 text-xl font-bold mt-2">
+                    Target: {summary.target}
+                  </p>
+                )}
+
                 <p className="text-slate-400 mt-2">
                   Run Rate: {current?.runRate || "0.00"}
                   {current?.requiredRate &&
@@ -196,6 +225,73 @@ export default function MatchAdmin() {
             >
               <option value={1}>1st Innings</option>
 
+              {secondInningsExists && <option value={2}>2nd Innings</option>}
+            </select>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <select
+                value={batsmanId}
+                onChange={(e) => setBatsmanId(e.target.value)}
+                className="h-12 rounded-xl bg-[#111c40] border border-slate-700 px-4 text-white"
+              >
+                <option value="">Select Striker</option>
+
+                {playersData?.battingPlayers?.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={nonStrikerId}
+                onChange={(e) => setNonStrikerId(e.target.value)}
+                className="h-12 rounded-xl bg-[#111c40] border border-slate-700 px-4 text-white"
+              >
+                <option value="">Select Non-Striker</option>
+
+                {playersData?.battingPlayers?.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={bowlerId}
+                onChange={(e) => setBowlerId(e.target.value)}
+                className="h-12 rounded-xl bg-[#111c40] border border-slate-700 px-4 text-white"
+              >
+                <option value="">Select Bowler</option>
+
+                {playersData?.bowlingPlayers?.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={batsmanOutId}
+                onChange={(e) => setBatsmanOutId(e.target.value)}
+                className="h-12 rounded-xl bg-[#111c40] border border-slate-700 px-4 text-white"
+              >
+                <option value="">Out Batsman</option>
+
+                {playersData?.battingPlayers?.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <select
+              className="w-full sm:w-60 h-12 rounded-xl bg-[#111c40] border border-slate-700 px-4 text-white"
+              value={inningsNo}
+              onChange={(e) => setInningsNo(Number(e.target.value))}
+            >
+              <option value={1}>1st Innings</option>
               {secondInningsExists && <option value={2}>2nd Innings</option>}
             </select>
 
