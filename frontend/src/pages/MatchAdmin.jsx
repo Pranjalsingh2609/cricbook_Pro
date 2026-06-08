@@ -18,10 +18,10 @@ function groupOvers(balls = []) {
     const value = b.is_wicket
       ? "W"
       : b.extra_type === "wide"
-      ? "Wd"
-      : b.extra_type === "no_ball"
-      ? "Nb"
-      : b.runs_bat;
+        ? "Wd"
+        : b.extra_type === "no_ball"
+          ? "Nb"
+          : b.runs_bat;
 
     overs[overIndex].push(value);
 
@@ -44,7 +44,6 @@ export default function MatchAdmin() {
   const [nonStriker, setNonStriker] = useState("");
   const [bowler, setBowler] = useState("");
   const [nextBatsman, setNextBatsman] = useState("");
- 
 
   /* ================= DATA ================= */
   const { data, isLoading, refetch } = useQuery({
@@ -63,14 +62,7 @@ export default function MatchAdmin() {
     enabled: !!id,
   });
 
-  const { data: playersData } = useQuery({
-    queryKey: ["match-players", id],
-    queryFn: async () => {
-      const res = await api.get(`/matches/${id}/players`);
-      return res.data;
-    },
-    enabled: !!id,
-  });
+
 
   /* ================= MEMO (FIXED DEPENDENCY ISSUE) ================= */
   const overs = useMemo(() => {
@@ -78,7 +70,12 @@ export default function MatchAdmin() {
   }, [data?.summary?.balls]);
 
   /* ================= ACTIONS ================= */
-  async function ball(runsBat, extraRuns = 0, extraType = null, isWicket = false) {
+  async function ball(
+    runsBat,
+    extraRuns = 0,
+    extraType = null,
+    isWicket = false,
+  ) {
     if (!striker || !bowler) {
       return alert("Select striker and bowler");
     }
@@ -117,7 +114,7 @@ export default function MatchAdmin() {
   const { matchData, summary } = data;
 
   const current = summary?.innings?.find(
-    (i) => Number(i.innings_no) === Number(1)
+    (i) => Number(i.innings_no) === Number(1),
   );
 
   /* ================= UI ================= */
@@ -127,7 +124,6 @@ export default function MatchAdmin() {
 
       <main className="min-h-screen bg-[#071028] text-white px-3 sm:px-6 py-4">
         <div className="max-w-5xl mx-auto space-y-5">
-
           {/* HEADER */}
           <div className="bg-[#0d1735] p-4 sm:p-6 rounded-2xl border border-slate-800 flex items-center gap-3">
             <Trophy className="text-emerald-400" />
@@ -153,54 +149,41 @@ export default function MatchAdmin() {
 
           {/* PLAYER CONTROL */}
           <div className="bg-[#0d1735] p-4 sm:p-6 rounded-2xl border border-slate-800 space-y-3">
-
             <h3 className="font-bold text-lg">Players Control</h3>
 
             <div className="grid sm:grid-cols-2 gap-3">
-              <select
+              {/* Striker Input */}
+              <input
                 className="p-2 bg-[#111c40] rounded"
+                placeholder="Enter Striker Name"
                 value={striker}
                 onChange={(e) => setStriker(e.target.value)}
-              >
-                <option value="">Select Striker</option>
-                {playersData?.battingPlayers?.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
+              />
 
-              <select
+              {/* Non Striker Input */}
+              <input
                 className="p-2 bg-[#111c40] rounded"
+                placeholder="Enter Non Striker Name"
                 value={nonStriker}
                 onChange={(e) => setNonStriker(e.target.value)}
-              >
-                <option value="">Select Non Striker</option>
-                {playersData?.battingPlayers?.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
+              />
             </div>
 
-            <select
+            {/* Bowler Input */}
+            <input
               className="w-full p-2 bg-[#111c40] rounded"
+              placeholder="Enter Bowler Name"
               value={bowler}
               onChange={(e) => setBowler(e.target.value)}
-            >
-              <option value="">Select Bowler</option>
-              {playersData?.bowlingPlayers?.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
+            />
 
-            <select
+            {/* Next Batsman Input */}
+            <input
               className="w-full p-2 bg-[#111c40] rounded"
+              placeholder="Enter Next Batsman Name"
               value={nextBatsman}
               onChange={(e) => setNextBatsman(e.target.value)}
-            >
-              <option value="">Next Batsman</option>
-              {playersData?.battingPlayers?.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
+            />
           </div>
 
           {/* RUNS */}
@@ -218,17 +201,26 @@ export default function MatchAdmin() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-3">
-              <button onClick={() => ball(0, 1, "wide")} className="bg-blue-500 p-3 rounded">
+              <button
+                onClick={() => ball(0, 1, "wide")}
+                className="bg-blue-500 p-3 rounded"
+              >
                 Wide
               </button>
 
-              <button onClick={() => ball(0, 1, "no_ball")} className="bg-purple-500 p-3 rounded">
+              <button
+                onClick={() => ball(0, 1, "no_ball")}
+                className="bg-purple-500 p-3 rounded"
+              >
                 No Ball
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-3">
-              <button onClick={() => ball(0, 0, null, true)} className="bg-amber-500 text-black p-3 rounded">
+              <button
+                onClick={() => ball(0, 0, null, true)}
+                className="bg-amber-500 text-black p-3 rounded"
+              >
                 Wicket
               </button>
 
@@ -255,7 +247,6 @@ export default function MatchAdmin() {
               </div>
             ))}
           </div>
-
         </div>
       </main>
     </>
