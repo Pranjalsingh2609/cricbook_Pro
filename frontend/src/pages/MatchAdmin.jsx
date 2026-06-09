@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo} from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Trophy } from "lucide-react";
@@ -47,6 +47,10 @@ export default function MatchAdmin() {
     bowler: "",
     nextBatsman: "",
     showWicketPopup: false,
+
+    // 🔥 NEW: match flow control (NO UI for team selection)
+    matchStarted: true, // assume already started OR controlled elsewhere
+    innings: 1,
   });
 
   /* ================= DATA ================= */
@@ -71,13 +75,20 @@ export default function MatchAdmin() {
     return groupOvers(data?.summary?.balls || []);
   }, [data?.summary?.balls]);
 
-  const { striker, nonStriker, bowler, nextBatsman, showWicketPopup } = state;
+  const {
+    striker,
+    nonStriker,
+    bowler,
+    nextBatsman,
+    showWicketPopup,
+    innings,
+  } = state;
 
   const currentInnings = data?.summary?.innings?.find(
-    (i) => Number(i.innings_no) === 1
+    (i) => Number(i.innings_no) === Number(innings)
   );
 
-  /* ================= BALL ACTION ================= */
+  /* ================= BALL ================= */
   async function handleBall(runsBat, extraRuns = 0, extraType = null, isWicket = false) {
     if (!striker || !bowler) {
       alert("Select striker and bowler");
@@ -85,7 +96,7 @@ export default function MatchAdmin() {
     }
 
     await api.post(`/matches/${id}/ball`, {
-      inningsNo: 1,
+      inningsNo: innings,
       batsmanId: Number(striker),
       bowlerId: Number(bowler),
       batsmanOutId: isWicket ? Number(striker) : null,
@@ -105,7 +116,7 @@ export default function MatchAdmin() {
   /* ================= UNDO ================= */
   async function handleUndo() {
     await api.post(`/matches/${id}/undo`, {
-      inningsNo: 1,
+      inningsNo: innings,
     });
 
     refetch();
@@ -147,6 +158,9 @@ export default function MatchAdmin() {
               <h1 className="text-xl sm:text-2xl font-bold">
                 {matchData.match.team_a_name} vs {matchData.match.team_b_name}
               </h1>
+
+              {/* ❌ REMOVED: batting team display (as you requested) */}
+
               <p className="text-slate-400 text-sm">
                 Status: {matchData.match.status}
               </p>
@@ -165,7 +179,7 @@ export default function MatchAdmin() {
             </p>
           </div>
 
-          {/* PLAYERS INPUT */}
+          {/* PLAYERS */}
           <div className="bg-[#0d1735] p-4 sm:p-6 rounded-2xl border border-slate-800 space-y-3">
             <h3 className="font-bold text-lg">Players Control</h3>
 
@@ -208,7 +222,7 @@ export default function MatchAdmin() {
             />
           </div>
 
-          {/* RUN BUTTONS */}
+          {/* ACTIONS */}
           <div className="bg-[#0d1735] p-4 sm:p-6 rounded-2xl border border-slate-800">
             <div className="grid grid-cols-3 gap-3">
               {[0, 1, 2, 3, 4, 6].map((r) => (
@@ -257,8 +271,8 @@ export default function MatchAdmin() {
 
           {/* WICKET POPUP */}
           {showWicketPopup && (
-            <div className="bg-black/60 fixed inset-0 flex items-center justify-center">
-              <div className="bg-[#0d1735] p-5 rounded-xl space-y-3 w-80">
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
+              <div className="bg-[#0d1735] p-5 rounded-xl w-80 space-y-3">
                 <h3 className="font-bold">New Batsman</h3>
 
                 <input
@@ -290,10 +304,7 @@ export default function MatchAdmin() {
 
                 <div className="flex gap-2 mt-2 flex-wrap">
                   {balls.map((b, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1 bg-slate-700 rounded"
-                    >
+                    <span key={i} className="px-3 py-1 bg-slate-700 rounded">
                       {b}
                     </span>
                   ))}
@@ -301,6 +312,7 @@ export default function MatchAdmin() {
               </div>
             ))}
           </div>
+
         </div>
       </main>
     </>
