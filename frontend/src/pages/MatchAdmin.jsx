@@ -51,7 +51,6 @@ export default function MatchAdmin() {
   }
 
 
-
   async function savePlayers(overrides = {}) {
     if (matchData.match.status !== "live") {
       alert("Start the match first.");
@@ -134,7 +133,7 @@ export default function MatchAdmin() {
 
   const currentOver = buildCurrentOver();
   const matchCompleted = data?.matchData?.match?.status === "completed";
-
+ 
   if (isLoading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#071028] text-white">
@@ -142,9 +141,7 @@ export default function MatchAdmin() {
       </div>
     );
   }
-
   const { matchData } = data;
-
 
     async function startMatch() {
     await api.post(`/matches/${id}/start`, {
