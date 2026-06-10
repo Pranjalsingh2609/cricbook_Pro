@@ -17,5 +17,5 @@ router.get('/:matchId/summary', scoreSummary);
 router.get('/:matchId/players', getMatchPlayers);
 router.post('/:matchId/ball', auth, addBall);
 router.post('/:matchId/undo', auth, undoBall);
-router.post("/matches/:matchId/innings/:inningsNo/players", auth, setCurrentPlayers);
+router.post('/:matchId/innings/:inningsNo/players', auth, setCurrentPlayers);
 export default router;
