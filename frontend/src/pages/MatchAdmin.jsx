@@ -50,14 +50,7 @@ export default function MatchAdmin() {
     setDraft({ strikerName: "", nonStrikerName: "", bowlerName: "" });
   }
 
-  async function startMatch() {
-    await api.post(`/matches/${id}/start`, {
-      tossWinnerId: matchData.match.team_a_id,
-      battingFirstTeamId: matchData.match.team_a_id,
-    });
 
-    await refetch();
-  }
 
   async function savePlayers(overrides = {}) {
     if (matchData.match.status !== "live") {
@@ -152,6 +145,16 @@ export default function MatchAdmin() {
 
   const { matchData } = data;
 
+
+    async function startMatch() {
+    await api.post(`/matches/${id}/start`, {
+      tossWinnerId: matchData.match.team_a_id,
+      battingFirstTeamId: matchData.match.team_a_id,
+    });
+
+    await refetch();
+  }
+
   return (
     <>
       <Navbar />
@@ -231,20 +234,21 @@ export default function MatchAdmin() {
               <h3 className="font-semibold text-sm text-slate-300 uppercase tracking-wide">
                 Players
               </h3>
-              {matchData.match.status === "scheduled" && (
-                <button
-                  onClick={startMatch}
-                  className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl mb-4"
-                >
-                  Start Match
-                </button>
-              )}
+
               {players.isSet && (
                 <span className="text-xs text-emerald-400 flex items-center gap-1">
                   <Zap className="w-3 h-3" /> Set
                 </span>
               )}
             </div>
+            {matchData.match.status === "scheduled" && (
+              <button
+                onClick={startMatch}
+                className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl mb-4"
+              >
+                Start Match
+              </button>
+            )}
 
             <div className="grid grid-cols-2 gap-2">
               <div>
