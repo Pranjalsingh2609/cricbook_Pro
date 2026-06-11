@@ -1,11 +1,7 @@
 import { query } from "../config/db.js";
-import {
-  isLegalBall,
-  oversText,
-  runRate,
-} from "../utils/score.js";
+import { isLegalBall, oversText, runRate } from "../utils/score.js";
 
-
+// looks up a player by name in a team; creates them if they don't exist yet
 async function resolvePlayer(name, teamId) {
   if (!name?.trim()) throw new Error("Player name is required");
 
@@ -25,8 +21,6 @@ async function resolvePlayer(name, teamId) {
   return created.rows[0].id;
 }
 
-
-
 export async function getMatch(req, res) {
   const { id } = req.params;
 
@@ -43,8 +37,7 @@ export async function getMatch(req, res) {
     [id]
   );
 
-  if (!match.rows[0])
-    return res.status(404).json({ message: "Match not found" });
+  if (!match.rows[0]) return res.status(404).json({ message: "Match not found" });
 
   const innings = await query(
     `SELECT
@@ -56,7 +49,7 @@ export async function getMatch(req, res) {
      LEFT JOIN players s  ON s.id  = i.striker_id
      LEFT JOIN players ns ON ns.id = i.non_striker_id
      LEFT JOIN players b  ON b.id  = i.current_bowler_id
-     WHERE i.match_id=$1
+     WHERE i.match_id = $1
      ORDER BY i.innings_no`,
     [id]
   );
@@ -64,27 +57,23 @@ export async function getMatch(req, res) {
   res.json({ match: match.rows[0], innings: innings.rows });
 }
 
-
-
 export async function startMatch(req, res) {
   const { id } = req.params;
   const { tossWinnerId, battingFirstTeamId } = req.body;
 
-  const m = await query("SELECT * FROM matches WHERE id=$1", [id]);
+  const m = await query("SELECT * FROM matches WHERE id = $1", [id]);
   const match = m.rows[0];
 
-  if (!match)
-    return res.status(404).json({ message: "Match not found" });
+  if (!match) return res.status(404).json({ message: "Match not found" });
 
+  // whichever team isn't batting first is bowling first
   const bowlingTeamId =
-    battingFirstTeamId === match.team_a_id
-      ? match.team_b_id
-      : match.team_a_id;
+    battingFirstTeamId === match.team_a_id ? match.team_b_id : match.team_a_id;
 
   await query(
     `UPDATE matches
-     SET status='live', toss_winner_id=$1, batting_first_team_id=$2
-     WHERE id=$3`,
+     SET status = 'live', toss_winner_id = $1, batting_first_team_id = $2
+     WHERE id = $3`,
     [tossWinnerId, battingFirstTeamId, id]
   );
 
@@ -92,7 +81,7 @@ export async function startMatch(req, res) {
     `INSERT INTO innings(
        match_id, batting_team_id, bowling_team_id,
        innings_no, runs, wickets, valid_balls, extras
-     ) VALUES ($1,$2,$3,1,0,0,0,0)
+     ) VALUES ($1, $2, $3, 1, 0, 0, 0, 0)
      RETURNING *`,
     [id, battingFirstTeamId, bowlingTeamId]
   );
@@ -100,22 +89,20 @@ export async function startMatch(req, res) {
   res.json({ innings: inn.rows[0] });
 }
 
-
-
 export async function setCurrentPlayers(req, res) {
   try {
+    // note: the route uses :matchId and :inningsNo
     const { matchId, inningsNo } = req.params;
     const { strikerName, nonStrikerName, bowlerName } = req.body;
 
     const inningsRes = await query(
-      `SELECT * FROM innings WHERE match_id=$1 AND innings_no=$2`,
+      `SELECT * FROM innings WHERE match_id = $1 AND innings_no = $2`,
       [matchId, inningsNo]
     );
     const innings = inningsRes.rows[0];
-    if (!innings)
-      return res.status(404).json({ message: "Innings not found" });
+    if (!innings) return res.status(404).json({ message: "Innings not found" });
 
-    // Resolve only names that were actually sent
+    // only resolve names that were actually provided
     const strikerId = strikerName
       ? await resolvePlayer(strikerName, innings.batting_team_id)
       : undefined;
@@ -133,7 +120,7 @@ export async function setCurrentPlayers(req, res) {
          striker_id        = COALESCE($1, striker_id),
          non_striker_id    = COALESCE($2, non_striker_id),
          current_bowler_id = COALESCE($3, current_bowler_id)
-       WHERE match_id=$4 AND innings_no=$5
+       WHERE match_id = $4 AND innings_no = $5
        RETURNING *`,
       [
         strikerId ?? null,
@@ -144,7 +131,7 @@ export async function setCurrentPlayers(req, res) {
       ]
     );
 
-    // Fetch with names joined
+    // re-join with player names so the response includes readable names
     const withNames = await query(
       `SELECT i.*,
               s.name  AS striker_name,
@@ -159,16 +146,14 @@ export async function setCurrentPlayers(req, res) {
     );
 
     req.io?.to(matchId).emit("players_updated", withNames.rows[0]);
-
     res.json({ innings: withNames.rows[0] });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 }
 
-
-
 export async function addBall(req, res) {
+  // note: this route uses :matchId (not :id)
   const { matchId } = req.params;
 
   const {
@@ -179,45 +164,34 @@ export async function addBall(req, res) {
     isWicket = false,
   } = req.body;
 
-
-  const matchCheck = await query(
-    "SELECT status FROM matches WHERE id=$1",
-    [matchId]
-  );
+  // don't allow scoring on a completed match
+  const matchCheck = await query("SELECT status FROM matches WHERE id = $1", [matchId]);
   if (matchCheck.rows[0]?.status === "completed")
     return res.status(400).json({ message: "Match already completed" });
 
- 
   const inningsResult = await query(
-    "SELECT * FROM innings WHERE match_id=$1 AND innings_no=$2",
+    "SELECT * FROM innings WHERE match_id = $1 AND innings_no = $2",
     [matchId, inningsNo]
   );
   const innings = inningsResult.rows[0];
-  if (!innings)
-    return res.status(404).json({ message: "Innings not started" });
+  if (!innings) return res.status(404).json({ message: "Innings not started" });
 
-  
   const batsmanId = innings.striker_id;
-  const bowlerId  = innings.current_bowler_id;
+  const bowlerId = innings.current_bowler_id;
 
   if (!batsmanId || !bowlerId) {
-    return res.status(400).json({
-      message: "Set striker and bowler before scoring",
-    });
+    return res.status(400).json({ message: "Set striker and bowler before scoring" });
   }
 
-
   const batsmanOutId = isWicket ? batsmanId : null;
-
   const legal = isLegalBall(extraType);
   const nextBallNo = Number(innings.valid_balls) + (legal ? 1 : 0);
-
 
   const ball = await query(
     `INSERT INTO balls (
        innings_id, batsman_id, bowler_id, batsman_out_id,
        ball_no, runs_bat, extra_runs, extra_type, is_wicket, is_legal
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING *`,
     [
       innings.id, batsmanId, bowlerId, batsmanOutId,
@@ -225,25 +199,24 @@ export async function addBall(req, res) {
     ]
   );
 
-  
-  const runs      = Number(innings.runs)       + runsBat + extraRuns;
-  const wickets   = Number(innings.wickets)    + (isWicket ? 1 : 0);
+  const runs = Number(innings.runs) + runsBat + extraRuns;
+  const wickets = Number(innings.wickets) + (isWicket ? 1 : 0);
   const validBalls = Number(innings.valid_balls) + (legal ? 1 : 0);
-  const extras    = Number(innings.extras)     + extraRuns;
+  const extras = Number(innings.extras) + extraRuns;
 
-
+  // clear striker on wicket so the UI prompts for a new batsman
   const updated = await query(
     `UPDATE innings SET
-       runs=$1, wickets=$2, valid_balls=$3, extras=$4,
+       runs = $1, wickets = $2, valid_balls = $3, extras = $4,
        striker_id = CASE WHEN $5 THEN NULL ELSE striker_id END
-     WHERE id=$6
+     WHERE id = $6
      RETURNING *`,
     [runs, wickets, validBalls, extras, isWicket, innings.id]
   );
 
- 
+  // build the current over display (last 6 legal balls + any extras in between)
   const ballsRes = await query(
-    `SELECT * FROM balls WHERE innings_id=$1 ORDER BY id DESC LIMIT 12`,
+    `SELECT * FROM balls WHERE innings_id = $1 ORDER BY id DESC LIMIT 12`,
     [innings.id]
   );
 
@@ -263,17 +236,17 @@ export async function addBall(req, res) {
     if (b.is_legal) ballCount++;
   }
 
- 
+  // check if the chasing team has won in the second innings
   if (Number(inningsNo) === 2) {
     const first = await query(
-      `SELECT * FROM innings WHERE match_id=$1 AND innings_no=1`,
+      `SELECT * FROM innings WHERE match_id = $1 AND innings_no = 1`,
       [matchId]
     );
-    const target = first.rows[0]?.runs + 1;
+    const target = (first.rows[0]?.runs ?? 0) + 1;
 
-    if (target && runs >= target) {
+    if (runs >= target) {
       await query(
-        `UPDATE matches SET status='completed', winner_team_id=$1 WHERE id=$2`,
+        `UPDATE matches SET status = 'completed', winner_team_id = $1 WHERE id = $2`,
         [innings.batting_team_id, matchId]
       );
       req.io?.to(matchId).emit("match_completed", {
@@ -289,19 +262,20 @@ export async function addBall(req, res) {
     }
   }
 
-
+  // check if the first innings is over (overs used up or all out)
   const matchInfo = await query(
     `SELECT m.*, t.overs FROM matches m
-     JOIN tournaments t ON t.id=m.tournament_id
-     WHERE m.id=$1`,
+     JOIN tournaments t ON t.id = m.tournament_id
+     WHERE m.id = $1`,
     [matchId]
   );
-  const ballsLimit     = Number(matchInfo.rows[0].overs) * 6;
+  const ballsLimit = Number(matchInfo.rows[0].overs) * 6;
   const inningsFinished = validBalls >= ballsLimit || wickets >= 10;
 
   if (inningsFinished && Number(inningsNo) === 1) {
+    // auto-create the second innings row if it doesn't exist yet
     const exists = await query(
-      `SELECT * FROM innings WHERE match_id=$1 AND innings_no=2`,
+      `SELECT * FROM innings WHERE match_id = $1 AND innings_no = 2`,
       [matchId]
     );
     if (!exists.rows.length) {
@@ -309,13 +283,12 @@ export async function addBall(req, res) {
         `INSERT INTO innings(
            match_id, batting_team_id, bowling_team_id,
            innings_no, runs, wickets, valid_balls, extras
-         ) VALUES ($1,$2,$3,2,0,0,0,0)`,
+         ) VALUES ($1, $2, $3, 2, 0, 0, 0, 0)`,
         [matchId, innings.bowling_team_id, innings.batting_team_id]
       );
     }
     req.io?.to(matchId).emit("innings_changed", { inningsNo: 2 });
   }
-
 
   if (isWicket) {
     req.io?.to(matchId).emit("wicket_fallen", {
@@ -338,31 +311,27 @@ export async function addBall(req, res) {
   });
 }
 
-
-
 export async function undoBall(req, res) {
   const { matchId } = req.params;
   const { inningsNo = 1 } = req.body;
 
   const inningsRes = await query(
-    `SELECT * FROM innings WHERE match_id=$1 AND innings_no=$2`,
+    `SELECT * FROM innings WHERE match_id = $1 AND innings_no = $2`,
     [matchId, inningsNo]
   );
   const innings = inningsRes.rows[0];
-  if (!innings)
-    return res.status(404).json({ message: "Innings not found" });
+  if (!innings) return res.status(404).json({ message: "Innings not found" });
 
   const last = await query(
-    `SELECT * FROM balls WHERE innings_id=$1 ORDER BY id DESC LIMIT 1`,
+    `SELECT * FROM balls WHERE innings_id = $1 ORDER BY id DESC LIMIT 1`,
     [innings.id]
   );
   const ball = last.rows[0];
-  if (!ball)
-    return res.status(400).json({ message: "No ball to undo" });
+  if (!ball) return res.status(400).json({ message: "No ball to undo" });
 
-  await query(`DELETE FROM balls WHERE id=$1`, [ball.id]);
+  await query(`DELETE FROM balls WHERE id = $1`, [ball.id]);
 
-  // If the last ball was a wicket, restore the striker
+  // if the undone ball was a wicket, restore the batsman as striker
   const updated = await query(
     `UPDATE innings SET
        runs        = runs        - $1,
@@ -370,45 +339,54 @@ export async function undoBall(req, res) {
        valid_balls = valid_balls - $3,
        extras      = extras      - $4,
        striker_id  = CASE WHEN $5 THEN $6 ELSE striker_id END
-     WHERE id=$7
+     WHERE id = $7
      RETURNING *`,
     [
       ball.runs_bat + ball.extra_runs,
       ball.is_wicket ? 1 : 0,
-      ball.is_legal  ? 1 : 0,
+      ball.is_legal ? 1 : 0,
       ball.extra_runs,
-      ball.is_wicket,        // if it was a wicket...
-      ball.batsman_id,       // ...restore that batsman as striker
+      ball.is_wicket,
+      ball.batsman_id,
       innings.id,
     ]
   );
 
-  req.io?.to(matchId).emit("score_updated", {
-    innings: updated.rows[0],
-    undo: true,
-  });
-
+  req.io?.to(matchId).emit("score_updated", { innings: updated.rows[0], undo: true });
   res.json({ innings: updated.rows[0], undo: true });
 }
-
 
 export async function scoreSummary(req, res) {
   const { matchId } = req.params;
 
   const innings = await query(
-    `SELECT * FROM innings WHERE match_id=$1 ORDER BY innings_no`,
+    `SELECT * FROM innings WHERE match_id = $1 ORDER BY innings_no`,
+    [matchId]
+  );
+
+  // also fetch balls with player names joined so the frontend can build scorecards
+  const balls = await query(
+    `SELECT
+       b.*,
+       bat.name  AS batsman_name,
+       bowl.name AS bowler_name
+     FROM balls b
+     JOIN innings i ON i.id = b.innings_id
+     LEFT JOIN players bat  ON bat.id  = b.batsman_id
+     LEFT JOIN players bowl ON bowl.id = b.bowler_id
+     WHERE i.match_id = $1
+     ORDER BY b.id`,
     [matchId]
   );
 
   const formatted = innings.rows.map((i) => ({
     ...i,
-    overs:   oversText(i.valid_balls),
+    overs: oversText(i.valid_balls),
     runRate: runRate(i.runs, i.valid_balls),
   }));
 
-  res.json({ innings: formatted });
+  res.json({ innings: formatted, balls: balls.rows });
 }
-
 
 export async function getMatchPlayers(req, res) {
   const { matchId } = req.params;
@@ -416,14 +394,14 @@ export async function getMatchPlayers(req, res) {
   const batting = await query(
     `SELECT p.id, p.name FROM players p
      JOIN match_players mp ON mp.player_id = p.id
-     WHERE mp.match_id=$1 AND mp.role='batting'`,
+     WHERE mp.match_id = $1 AND mp.role = 'batting'`,
     [matchId]
   );
 
   const bowling = await query(
     `SELECT p.id, p.name FROM players p
      JOIN match_players mp ON mp.player_id = p.id
-     WHERE mp.match_id=$1 AND mp.role='bowling'`,
+     WHERE mp.match_id = $1 AND mp.role = 'bowling'`,
     [matchId]
   );
 
